@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kit de Herramientas del Reconocimiento</title>
+<style>
+  :root {
+    --terracota: #C97B5C;
+    --dorado: #D9A857;
+    --crema: #FBF3E9;
+    --texto: #3A2E28;
+    --coral: #E2926E;
+    --verde: #6B8F71;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: Georgia, 'Times New Roman', serif;
+    background: var(--crema);
+    color: var(--texto);
+    display: flex;
+    justify-content: center;
+    padding: 32px 16px;
+  }
+  .wrap { max-width: 760px; width: 100%; }
+  h1 { font-size: 1.7rem; color: var(--terracota); margin-bottom: 4px; }
+  h2 { font-size: 1.25rem; color: var(--terracota); margin: 0 0 4px; }
+  .sub { font-style: italic; color: #8a7364; margin-bottom: 20px; font-size: 0.95rem; }
+  .sub-sm { font-style: italic; color: #8a7364; margin-bottom: 18px; font-size: 0.88rem; }
+
+  /* Navegación principal del kit */
+  .kit-tabs { display: flex; gap: 8px; margin-bottom: 26px; flex-wrap: wrap; }
+  .kit-tab {
+    background: #fff; border: 2px solid #eadfd2; border-radius: 999px;
+    padding: 10px 18px; font-family: inherit; font-size: 0.92rem; cursor: pointer; color: var(--texto);
+  }
+  .kit-tab.active { background: var(--terracota); border-color: var(--terracota); color: #fff; }
+  .kit-section { display: none; }
+  .kit-section.active { display: block; }
+
+  .card {
+    background: #fff; border-radius: 16px; padding: 24px 28px;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.06); margin-bottom: 24px; line-height: 1.6;
+  }
+  .card p { margin: 0 0 12px; }
+  .card p:last-child { margin-bottom: 0; }
+
+  /* --- Herramienta 1: Desactiva el Impulso --- */
+  .tool-impulso {
+    background: linear-gradient(160deg, #fff 0%, #fdf0e4 100%);
+    border-radius: 20px; padding: 28px; text-align: center; box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+  }
+  .circle {
+    width: 150px; height: 150px; margin: 0 auto 20px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, var(--dorado), var(--terracota));
+    display: flex; align-items: center; justify-content: center; color: #fff;
+    font-size: 1.1rem; font-weight: bold; transition: transform 4s ease-in-out; transform: scale(1);
+  }
+  .circle.inhale { transform: scale(1.35); }
+  .circle.exhale { transform: scale(1); }
+  .timer { font-size: 2rem; color: var(--terracota); font-weight: bold; margin: 12px 0; }
+  .msg { min-height: 28px; font-style: italic; color: #8a7364; margin-top: 10px; }
+  .done {
+    display: none; background: #fdf0e4; border-radius: 14px; padding: 18px;
+    margin-top: 18px; text-align: left; line-height: 1.6;
+  }
+
+  /* Botones genéricos */
+  button.primary {
+    background: var(--terracota); color: #fff; border: none; border-radius: 999px;
+    padding: 12px 28px; font-size: 1rem; font-family: inherit; cursor: pointer;
+    display: block; margin: 20px auto 0;
+  }
+  button.primary:disabled { opacity: 0.5; cursor: default; }
+  button.secondary {
+    background: transparent; color: var(--terracota); border: 2px solid var(--terracota);
+    border-radius: 999px; padding: 8px 18px; font-size: 0.85rem; font-family: inherit; cursor: pointer;
+  }
+
+  /* --- Herramienta 2: Rastreador --- */
+  .r-tabs { display: flex; gap: 8px; margin-bottom: 18px; flex-wrap: wrap; }
+  .r-tab-btn {
+    background: #fff; border: 2px solid #eadfd2; border-radius: 999px;
+    padding: 8px 16px; font-family: inherit; font-size: 0.85rem; cursor: pointer; color: var(--texto);
+  }
+  .r-tab-btn.active { background: var(--terracota); border-color: var(--terracota); color: #fff; }
+  .r-panel { display: none; }
+  .r-panel.active { display: block; }
+  .tool {
+    background: #fff; border-radius: 20px; padding: 26px;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.08); margin-bottom: 20px;
+  }
+  label { display: block; font-weight: bold; font-size: 0.9rem; margin-bottom: 4px; margin-top: 14px; }
+  input[type="date"], input[type="text"], input[type="number"], select, textarea {
+    width: 100%; padding: 10px 12px; border: 2px solid #eadfd2; border-radius: 10px;
+    font-family: inherit; font-size: 0.95rem; background: var(--crema);
+  }
+  textarea { resize: vertical; min-height: 60px; }
+  .range-row { display: flex; align-items: center; gap: 10px; }
+  .range-row input[type="range"] { flex: 1; }
+  .range-val { font-weight: bold; color: var(--terracota); min-width: 24px; text-align: center; }
+  .toggle-row { display: flex; gap: 10px; margin-top: 4px; }
+  .toggle-row label {
+    margin: 0; font-weight: normal; flex: 1; text-align: center;
+    border: 2px solid #eadfd2; border-radius: 10px; padding: 8px; cursor: pointer;
+  }
+  .toggle-row input { display: none; }
+  .toggle-row input:checked + span { color: #fff; }
+  .toggle-row label:has(input:checked) { background: var(--terracota); border-color: var(--terracota); color: #fff; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+  th, td { padding: 8px 6px; text-align: left; border-bottom: 1px solid #eadfd2; }
+  th { color: var(--terracota); }
+  .fase-badge { font-size: 0.75rem; padding: 2px 8px; border-radius: 999px; background: var(--crema); }
+  .dash-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px; margin-bottom: 20px; }
+  .dash-item { background: #fdf0e4; border-radius: 14px; padding: 16px; text-align: center; }
+  .dash-item .num { font-size: 1.5rem; font-weight: bold; color: var(--terracota); }
+  .dash-item .lbl { font-size: 0.78rem; color: #8a7364; margin-top: 4px; }
+  .chart-wrap { background: #fff; border-radius: 16px; padding: 20px; }
+  .empty-msg { color: #b0a08f; font-style: italic; text-align: center; padding: 20px 0; }
+  .mapa-item { border-left: 3px solid var(--dorado); padding: 10px 14px; margin-bottom: 10px; background: #fdf8f2; border-radius: 0 10px 10px 0; }
+  .mapa-item .sit { font-weight: bold; }
+  .mapa-item .alt { color: var(--verde); font-style: italic; margin-top: 4px; }
+  .actions-row { display: flex; justify-content: center; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+
+  /* --- Herramienta 3: Qué Hacer Cuando Vuelve --- */
+  .q { margin-bottom: 22px; }
+  .q p { font-weight: bold; margin-bottom: 10px; }
+  .opts { display: flex; gap: 12px; }
+  .opts label {
+    flex: 1; text-align: center; padding: 10px; border: 2px solid #eadfd2;
+    border-radius: 10px; cursor: pointer; font-size: 0.95rem; transition: all 0.15s;
+  }
+  .opts input { display: none; }
+  .opts input:checked + span { color: #fff; }
+  .opts label:has(input:checked) { background: var(--terracota); border-color: var(--terracota); color: #fff; }
+  .result {
+    display: none; margin-top: 22px; background: #fdf0e4; border-radius: 14px; padding: 20px; line-height: 1.6;
+  }
+  .result h3 { margin-top: 0; color: var(--terracota); }
+  .script-box {
+    background: #fff; border-left: 4px solid var(--dorado); padding: 12px 16px; margin-top: 10px; font-style: italic;
+  }
+
+  footer { text-align: center; color: #b0a08f; font-size: 0.8rem; margin-top: 28px; line-height: 1.6; }
+
+  .modo-reporte .kit-tabs,
+  .modo-reporte .kit-section:not(#kit-rastreador),
+  .modo-reporte #kit-rastreador > .card,
+  .modo-reporte .r-tabs,
+  .modo-reporte .r-panel:not(#rpanel-dashboard),
+  .modo-reporte .actions-row,
+  .modo-reporte #kit-rastreador > p.sub-sm,
+  .modo-reporte button { display: none !important; }
+  .modo-reporte #kit-rastreador,
+  .modo-reporte #rpanel-dashboard { display: block !important; }
+  .modo-reporte::before {
+    content: "Reporte de Progreso — El Protocolo del Reconocimiento";
+    display: block; font-size: 1.3rem; font-weight: bold; color: var(--terracota); margin-bottom: 14px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Kit de Herramientas del Reconocimiento</h1>
+  <div class="sub">Complemento interactivo de "El Protocolo del Reconocimiento"</div>
+
+  <div class="kit-tabs">
+    <button class="kit-tab active" data-kit="impulso">Desactiva el Impulso</button>
+    <button class="kit-tab" data-kit="rastreador">Rastreador de 21 Días</button>
+    <button class="kit-tab" data-kit="vuelve">¿Qué Hacer Cuando Vuelve?</button>
+  </div>
+
+  <!-- ===================== HERRAMIENTA 1: DESACTIVA EL IMPULSO ===================== -->
+  <div class="kit-section active" id="kit-impulso">
+    <h2>Desactiva el Impulso</h2>
+    <div class="sub-sm">Una pausa de 90 segundos para cuando sientas el impulso de revisar el teléfono o escribirle.</div>
+
+    <div class="card">
+      <p><strong>Por qué funciona esto:</strong> cuando sientes el impulso de revisar el teléfono, escribirle o esperar una respuesta, no estás "eligiendo" hacerlo — estás dentro de un pico emocional automático. La neuroanatomista Jill Bolte Taylor documentó que una oleada emocional automática dura, en promedio, unos 90 segundos en el cuerpo antes de disiparse por sí sola; lo que la mantiene mucho más tiempo no es la emoción en sí, sino los pensamientos con los que la seguimos alimentando después (Bolte Taylor, 2006).</p>
+      <p>Eso significa algo muy práctico: no necesitas "vencer" el impulso con fuerza de voluntad. Solo necesitas atravesar los 90 segundos sin alimentarlo con una acción (revisar, escribir, buscar). Esta herramienta te acompaña exactamente esos 90 segundos.</p>
+    </div>
+
+    <div class="tool-impulso">
+      <div class="circle" id="circle">Respira</div>
+      <div class="timer" id="timer">90</div>
+      <div id="phaseMsg" class="msg">Presiona empezar cuando sientas el impulso.</div>
+      <button class="primary" id="startBtn">Empezar pausa de 90 segundos</button>
+
+      <div class="done" id="doneBox">
+        <p><strong>Lo atravesaste.</strong> El pico automático ya pasó por tu cuerpo sin que lo alimentaras con una acción. Eso no significa que el sentimiento desapareció por completo — significa que ya no está decidiendo por ti.</p>
+        <p>Antes de volver a tu teléfono, responde en la pestaña "Rastreador de 21 Días": <em>"¿qué necesito en este momento que no dependa de la respuesta de otra persona?"</em></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== HERRAMIENTA 2: RASTREADOR DE 21 DÍAS ===================== -->
+  <div class="kit-section" id="kit-rastreador">
+    <h2>Rastreador de 21 Días</h2>
+    <div class="sub-sm">Tu diario, tu mapa de patrones y tu dashboard de progreso, en un solo lugar.</div>
+
+    <div class="card">
+      <p><strong>Cómo usar esta herramienta:</strong> registra una entrada por día durante tu protocolo. La fase se calcula sola según el día. El Dashboard y el gráfico de evolución se actualizan automáticamente con cada entrada que guardas.</p>
+      <p>Todo lo que escribes aquí se guarda únicamente en este navegador, en este dispositivo — nadie más lo ve, no se sube a ningún servidor. Usa el botón "Descargar respaldo" si quieres guardar una copia o pasar tus datos a otro dispositivo.</p>
+    </div>
+
+    <div class="r-tabs">
+      <button class="r-tab-btn active" data-rtab="rastreador">Rastreador 21 Días</button>
+      <button class="r-tab-btn" data-rtab="mapa">Mapa del Ciclo Emocional</button>
+      <button class="r-tab-btn" data-rtab="dashboard">Dashboard</button>
+    </div>
+
+    <div class="r-panel active" id="rpanel-rastreador">
+      <div class="tool">
+        <label>Día del protocolo</label>
+        <input type="number" id="r-dia" min="1" max="21" value="1">
+        <label>Fase (automática)</label>
+        <input type="text" id="r-fase" disabled>
+        <label>Fecha</label>
+        <input type="date" id="r-fecha">
+
+        <label>Ánimo antes (1-10)</label>
+        <div class="range-row"><input type="range" id="r-antes" min="1" max="10" value="5"><span class="range-val" id="r-antes-val">5</span></div>
+
+        <label>Ánimo después (1-10)</label>
+        <div class="range-row"><input type="range" id="r-despues" min="1" max="10" value="5"><span class="range-val" id="r-despues-val">5</span></div>
+
+        <label>¿Practiqué un límite hoy?</label>
+        <div class="toggle-row">
+          <label><input type="radio" name="r-limite" value="Sí"><span>Sí</span></label>
+          <label><input type="radio" name="r-limite" value="No" checked><span>No</span></label>
+        </div>
+
+        <label>Autovaloración (1-10)</label>
+        <div class="range-row"><input type="range" id="r-autoval" min="1" max="10" value="5"><span class="range-val" id="r-autoval-val">5</span></div>
+
+        <label>Reflexión breve</label>
+        <textarea id="r-reflexion" placeholder="Tres a cinco líneas son suficientes."></textarea>
+
+        <button class="primary" id="r-guardar">Guardar entrada del Día</button>
+      </div>
+
+      <div class="tool">
+        <p class="sub-sm" id="r-tabla-hint" style="display:none;">Toca una fila para cargarla arriba y editarla.</p>
+        <table id="r-tabla">
+          <thead><tr><th>Día</th><th>Fase</th><th>Ánimo A→D</th><th>Límite</th><th>Autoval.</th></tr></thead>
+          <tbody></tbody>
+        </table>
+        <div class="empty-msg" id="r-empty">Todavía no registras ninguna entrada.</div>
+      </div>
+    </div>
+
+    <div class="r-panel" id="rpanel-mapa">
+      <div class="tool">
+        <label>Situación disparadora</label>
+        <input type="text" id="m-situacion" placeholder="Ej: Me escribe a las 11pm después de 4 días de silencio">
+        <label>Pensamiento automático</label>
+        <input type="text" id="m-pensamiento">
+        <label>Emoción principal</label>
+        <input type="text" id="m-emocion">
+        <label>Intensidad (1-10)</label>
+        <div class="range-row"><input type="range" id="m-intensidad" min="1" max="10" value="5"><span class="range-val" id="m-intensidad-val">5</span></div>
+        <label>Comportamiento habitual</label>
+        <textarea id="m-comportamiento"></textarea>
+        <label>Respuesta alternativa (blindaje)</label>
+        <textarea id="m-alternativa"></textarea>
+        <button class="primary" id="m-guardar">Guardar patrón</button>
+      </div>
+      <div class="tool" id="m-lista"></div>
+    </div>
+
+    <div class="r-panel" id="rpanel-dashboard">
+      <div class="dash-grid" id="dash-grid"></div>
+      <div class="chart-wrap">
+        <p style="font-weight:bold; margin-bottom:10px;">Evolución de tu Autovaloración (Día 1-21)</p>
+        <svg id="chart-svg" width="100%" height="220" viewBox="0 0 680 220"></svg>
+        <div class="empty-msg" id="chart-empty">Guarda al menos 2 entradas para ver tu evolución.</div>
+      </div>
+      <button class="primary" id="btn-report">Generar reporte imprimible</button>
+    </div>
+
+    <div class="actions-row">
+      <button class="secondary" id="btn-export">Descargar respaldo (.json)</button>
+      <button class="secondary" id="btn-import">Importar respaldo (.json)</button>
+      <button class="secondary" id="btn-reset">Borrar todos mis datos</button>
+      <input type="file" id="file-import" accept="application/json" style="display:none;">
+    </div>
+    <p class="sub-sm" style="text-align:center;">¿Cambiaste de computadora o de teléfono? Descarga tu respaldo en el dispositivo anterior y lo importas aquí — tus datos viajan contigo, en un archivo que solo tú controlas.</p>
+  </div>
+
+  <!-- ===================== HERRAMIENTA 3: QUÉ HACER CUANDO VUELVE ===================== -->
+  <div class="kit-section" id="kit-vuelve">
+    <h2>¿Qué Hacer Cuando Él/Ella Vuelve?</h2>
+    <div class="sub-sm">Una lectura rápida de la situación antes de reaccionar por impulso.</div>
+
+    <div class="card">
+      <p><strong>Por qué esta situación es especialmente confusa:</strong> como viste en el Capítulo 1 del libro, la atención impredecible engancha más que la constante (Ferster & Skinner, 1957). Por eso un regreso después de silencio, aunque sea breve o vago, puede sentirse más intenso que meses de estabilidad con otra persona — tu cerebro no está midiendo cuánto te conviene, está reaccionando a la incertidumbre.</p>
+      <p>Responde estas tres preguntas con honestidad. Al final vas a recibir una lectura orientativa de la situación y un guion de respuesta adaptado — no es un diagnóstico infalible, es una herramienta para pausar antes de reaccionar por impulso.</p>
+    </div>
+
+    <div class="tool">
+      <div class="q">
+        <p>1. ¿Volvió después de varios días (o más) de silencio, sin que haya pasado nada nuevo de su parte?</p>
+        <div class="opts">
+          <label><input type="radio" name="q1" value="1"><span>Sí</span></label>
+          <label><input type="radio" name="q1" value="0"><span>No</span></label>
+        </div>
+      </div>
+      <div class="q">
+        <p>2. Lo que dice que "cambió", ¿se puede ver en una acción concreta ya realizada, no solo en palabras o promesas?</p>
+        <div class="opts">
+          <label><input type="radio" name="q2" value="0"><span>Sí</span></label>
+          <label><input type="radio" name="q2" value="1"><span>No</span></label>
+        </div>
+      </div>
+      <div class="q">
+        <p>3. Si dices que no ahora, ¿sientes que esta vez sí lo vas a lamentar "para siempre"?</p>
+        <div class="opts">
+          <label><input type="radio" name="q3" value="1"><span>Sí</span></label>
+          <label><input type="radio" name="q3" value="0"><span>No</span></label>
+        </div>
+      </div>
+
+      <button class="primary" id="verBtn">Ver mi lectura de la situación</button>
+
+      <div class="result" id="result"></div>
+    </div>
+  </div>
+
+  <footer>
+    El Protocolo del Reconocimiento — herramientas de acompañamiento, no sustituyen orientación<br>
+    profesional de salud mental. Si sientes que necesitas apoyo adicional, busca acompañamiento<br>
+    de un psicólogo o terapeuta.
+  </footer>
+</div>
+
+<script>
+  /* ---------- Navegación principal del kit ---------- */
+  document.querySelectorAll('.kit-tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.kit-tab').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.kit-section').forEach(s => s.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('kit-' + btn.dataset.kit).classList.add('active');
+      if (btn.dataset.kit === 'rastreador') renderDashboard();
+    });
+  });
+
+  /* ---------- Herramienta 1: Desactiva el Impulso ---------- */
+  (function () {
+    const circle = document.getElementById('circle');
+    const timerEl = document.getElementById('timer');
+    const phaseMsg = document.getElementById('phaseMsg');
+    const startBtn = document.getElementById('startBtn');
+    const doneBox = document.getElementById('doneBox');
+    let totalSeconds = 90;
+    let running = false;
+
+    function setPhase(isInhale) {
+      circle.classList.remove('inhale', 'exhale');
+      if (isInhale) {
+        circle.classList.add('inhale');
+        circle.textContent = 'Inhala';
+        phaseMsg.textContent = 'Inhala lento, cuenta hasta 4 en tu cabeza.';
+      } else {
+        circle.classList.add('exhale');
+        circle.textContent = 'Exhala';
+        phaseMsg.textContent = 'Exhala despacio, más largo que la inhalada.';
+      }
+    }
+
+    startBtn.addEventListener('click', () => {
+      if (running) return;
+      running = true;
+      startBtn.disabled = true;
+      doneBox.style.display = 'none';
+      totalSeconds = 90;
+      timerEl.textContent = totalSeconds;
+      let inhale = true;
+      setPhase(inhale);
+      const breathInterval = setInterval(() => { inhale = !inhale; setPhase(inhale); }, 4000);
+      const countdown = setInterval(() => {
+        totalSeconds -= 1;
+        timerEl.textContent = totalSeconds;
+        if (totalSeconds <= 0) {
+          clearInterval(countdown); clearInterval(breathInterval);
+          circle.classList.remove('inhale', 'exhale');
+          circle.textContent = 'Listo';
+          phaseMsg.textContent = 'Los 90 segundos pasaron.';
+          doneBox.style.display = 'block';
+          startBtn.disabled = false;
+          running = false;
+        }
+      }, 1000);
+    });
+  })();
+
+  /* ---------- Herramienta 2: Rastreador de 21 Días ---------- */
+  const STORE_KEY = 'epdr_rastreador_v1';
+  const MAPA_KEY = 'epdr_mapa_v1';
+
+  function faseDeDia(d) {
+    if (d <= 7) return 'Fase I: Reconocer';
+    if (d <= 14) return 'Fase II: Reconstruir';
+    return 'Fase III: Reclamar';
+  }
+  function loadData() { try { return JSON.parse(localStorage.getItem(STORE_KEY)) || []; } catch(e) { return []; } }
+  function saveData(arr) { try { localStorage.setItem(STORE_KEY, JSON.stringify(arr)); } catch(e) {} }
+  function loadMapa() { try { return JSON.parse(localStorage.getItem(MAPA_KEY)) || []; } catch(e) { return []; } }
+  function saveMapa(arr) { try { localStorage.setItem(MAPA_KEY, JSON.stringify(arr)); } catch(e) {} }
+
+  document.querySelectorAll('.r-tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.r-tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.r-panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('rpanel-' + btn.dataset.rtab).classList.add('active');
+      if (btn.dataset.rtab === 'dashboard') renderDashboard();
+    });
+  });
+
+  [['r-antes','r-antes-val'],['r-despues','r-despues-val'],['r-autoval','r-autoval-val'],['m-intensidad','m-intensidad-val']].forEach(([inId,valId]) => {
+    const inp = document.getElementById(inId), val = document.getElementById(valId);
+    inp.addEventListener('input', () => val.textContent = inp.value);
+  });
+
+  const diaInput = document.getElementById('r-dia');
+  const faseInput = document.getElementById('r-fase');
+  function updateFase() {
+    let d = parseInt(diaInput.value) || 1;
+    d = Math.min(21, Math.max(1, d));
+    faseInput.value = faseDeDia(d);
+  }
+  diaInput.addEventListener('input', updateFase);
+  updateFase();
+
+  function renderTabla() {
+    const data = loadData().sort((a,b) => a.dia - b.dia);
+    const tbody = document.querySelector('#r-tabla tbody');
+    tbody.innerHTML = '';
+    document.getElementById('r-empty').style.display = data.length ? 'none' : 'block';
+    document.getElementById('r-tabla-hint').style.display = data.length ? 'block' : 'none';
+    data.forEach(e => {
+      const tr = document.createElement('tr');
+      tr.style.cursor = 'pointer';
+      tr.title = 'Toca para editar esta entrada';
+      tr.innerHTML = `<td>${e.dia}</td><td><span class="fase-badge">${e.fase}</span></td><td>${e.antes} → ${e.despues}</td><td>${e.limite}</td><td>${e.autoval}</td>`;
+      tr.addEventListener('click', () => loadEntryToForm(e));
+      tbody.appendChild(tr);
+    });
+  }
+
+  function loadEntryToForm(e) {
+    diaInput.value = e.dia;
+    updateFase();
+    document.getElementById('r-fecha').value = e.fecha || '';
+    document.getElementById('r-antes').value = e.antes;
+    document.getElementById('r-antes-val').textContent = e.antes;
+    document.getElementById('r-despues').value = e.despues;
+    document.getElementById('r-despues-val').textContent = e.despues;
+    document.getElementById('r-autoval').value = e.autoval;
+    document.getElementById('r-autoval-val').textContent = e.autoval;
+    document.getElementById('r-reflexion').value = e.reflexion || '';
+    document.querySelectorAll('input[name="r-limite"]').forEach(r => { r.checked = (r.value === e.limite); });
+    document.getElementById('r-dia').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  document.getElementById('r-guardar').addEventListener('click', () => {
+    let d = parseInt(diaInput.value) || 1;
+    d = Math.min(21, Math.max(1, d));
+    const limiteRadio = document.querySelector('input[name="r-limite"]:checked');
+    const entry = {
+      dia: d, fase: faseDeDia(d),
+      fecha: document.getElementById('r-fecha').value,
+      antes: parseInt(document.getElementById('r-antes').value),
+      despues: parseInt(document.getElementById('r-despues').value),
+      limite: limiteRadio ? limiteRadio.value : 'No',
+      autoval: parseInt(document.getElementById('r-autoval').value),
+      reflexion: document.getElementById('r-reflexion').value
+    };
+    let data = loadData().filter(e => e.dia !== d);
+    data.push(entry);
+    saveData(data);
+    renderTabla();
+    document.getElementById('r-reflexion').value = '';
+  });
+
+  function renderMapa() {
+    const data = loadMapa();
+    const cont = document.getElementById('m-lista');
+    cont.innerHTML = data.length ? '' : '<p class="empty-msg">Todavía no registras ningún patrón.</p>';
+    data.slice().reverse().forEach(m => {
+      const div = document.createElement('div');
+      div.className = 'mapa-item';
+      div.innerHTML = `<div class="sit">${m.situacion} <span class="fase-badge">intensidad ${m.intensidad}</span></div>
+        <div>${m.pensamiento ? '"' + m.pensamiento + '"' : ''}</div>
+        <div class="alt">${m.alternativa ? 'Respuesta alternativa: ' + m.alternativa : ''}</div>`;
+      cont.appendChild(div);
+    });
+  }
+
+  document.getElementById('m-guardar').addEventListener('click', () => {
+    const entry = {
+      situacion: document.getElementById('m-situacion').value,
+      pensamiento: document.getElementById('m-pensamiento').value,
+      emocion: document.getElementById('m-emocion').value,
+      intensidad: parseInt(document.getElementById('m-intensidad').value),
+      comportamiento: document.getElementById('m-comportamiento').value,
+      alternativa: document.getElementById('m-alternativa').value
+    };
+    if (!entry.situacion) { alert('Describe al menos la situación disparadora.'); return; }
+    let data = loadMapa();
+    data.push(entry);
+    saveMapa(data);
+    renderMapa();
+    ['m-situacion','m-pensamiento','m-emocion','m-comportamiento','m-alternativa'].forEach(id => document.getElementById(id).value = '');
+  });
+
+  function renderDashboard() {
+    const data = loadData();
+    const grid = document.getElementById('dash-grid');
+    if (!data.length) {
+      grid.innerHTML = '<div class="empty-msg">Guarda tu primera entrada para ver tu Dashboard.</div>';
+    } else {
+      const avg = arr => (arr.reduce((a,b)=>a+b,0) / arr.length);
+      const antes = data.map(e=>e.antes), despues = data.map(e=>e.despues), autoval = data.map(e=>e.autoval);
+      const pctLimite = data.filter(e=>e.limite==='Sí').length / data.length * 100;
+      const items = [
+        ['Promedio ánimo ANTES', avg(antes).toFixed(1)],
+        ['Promedio ánimo DESPUÉS', avg(despues).toFixed(1)],
+        ['Mejora promedio de ánimo', (avg(despues)-avg(antes)).toFixed(1)],
+        ['% días con límite practicado', pctLimite.toFixed(0) + '%'],
+        ['Promedio de autovaloración', avg(autoval).toFixed(1)],
+        ['Días registrados', data.length + ' / 21']
+      ];
+      grid.innerHTML = items.map(([l,n]) => `<div class="dash-item"><div class="num">${n}</div><div class="lbl">${l}</div></div>`).join('');
+    }
+    renderChart(data);
+  }
+
+  function renderChart(data) {
+    const svg = document.getElementById('chart-svg');
+    const emptyMsg = document.getElementById('chart-empty');
+    const sorted = data.slice().sort((a,b)=>a.dia-b.dia);
+    if (sorted.length < 2) { svg.innerHTML = ''; emptyMsg.style.display = 'block'; return; }
+    emptyMsg.style.display = 'none';
+    const W = 680, H = 220, padL = 36, padR = 16, padT = 16, padB = 28;
+    const xFor = dia => padL + (dia-1)/20 * (W-padL-padR);
+    const yFor = val => H-padB - (val-1)/9 * (H-padT-padB);
+    let path = sorted.map((e,i) => `${i===0?'M':'L'} ${xFor(e.dia).toFixed(1)} ${yFor(e.autoval).toFixed(1)}`).join(' ');
+    let dots = sorted.map(e => `<circle cx="${xFor(e.dia).toFixed(1)}" cy="${yFor(e.autoval).toFixed(1)}" r="3.5" fill="#C97B5C"/>`).join('');
+    let axisY = [1,5,10].map(v => `<text x="4" y="${yFor(v)+4}" font-size="10" fill="#8a7364">${v}</text>`).join('');
+    let axisX = `<text x="${padL}" y="${H-6}" font-size="10" fill="#8a7364">Día 1</text><text x="${W-padR-30}" y="${H-6}" font-size="10" fill="#8a7364">Día 21</text>`;
+    svg.innerHTML = `<line x1="${padL}" y1="${padT}" x2="${padL}" y2="${H-padB}" stroke="#eadfd2"/><line x1="${padL}" y1="${H-padB}" x2="${W-padR}" y2="${H-padB}" stroke="#eadfd2"/>${axisY}${axisX}<path d="${path}" fill="none" stroke="#C97B5C" stroke-width="2.5"/>${dots}`;
+  }
+
+  document.getElementById('btn-export').addEventListener('click', () => {
+    const payload = { rastreador: loadData(), mapa: loadMapa(), exportado: new Date().toISOString() };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'respaldo-protocolo-del-reconocimiento.json';
+    a.click();
+  });
+
+  document.getElementById('btn-reset').addEventListener('click', () => {
+    if (confirm('Esto borra todas tus entradas guardadas en este navegador. ¿Confirmas?')) {
+      localStorage.removeItem(STORE_KEY);
+      localStorage.removeItem(MAPA_KEY);
+      renderTabla(); renderMapa(); renderDashboard();
+    }
+  });
+
+  document.getElementById('btn-import').addEventListener('click', () => {
+    document.getElementById('file-import').click();
+  });
+
+  document.getElementById('file-import').addEventListener('change', (ev) => {
+    const file = ev.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const payload = JSON.parse(reader.result);
+        const nuevosRastreador = Array.isArray(payload.rastreador) ? payload.rastreador : [];
+        const nuevosMapa = Array.isArray(payload.mapa) ? payload.mapa : [];
+        if (!nuevosRastreador.length && !nuevosMapa.length) {
+          alert('Este archivo no tiene el formato esperado de un respaldo de este kit.');
+          return;
+        }
+        const existentes = loadData();
+        const diasNuevos = new Set(nuevosRastreador.map(e => e.dia));
+        const combinados = existentes.filter(e => !diasNuevos.has(e.dia)).concat(nuevosRastreador);
+        saveData(combinados);
+        saveMapa(loadMapa().concat(nuevosMapa));
+        renderTabla(); renderMapa(); renderDashboard();
+        alert('Respaldo importado. Tus días se combinaron con lo que ya tenías en este dispositivo (los días repetidos se reemplazaron por los del archivo).');
+      } catch (err) {
+        alert('No se pudo leer el archivo. Asegúrate de que sea el .json exportado por este mismo kit.');
+      }
+      ev.target.value = '';
+    };
+    reader.readAsText(file);
+  });
+
+  document.getElementById('btn-report').addEventListener('click', () => {
+    renderDashboard();
+    document.body.classList.add('modo-reporte');
+    window.print();
+    setTimeout(() => document.body.classList.remove('modo-reporte'), 500);
+  });
+
+  renderTabla();
+  renderMapa();
+
+  /* ---------- Herramienta 3: Qué Hacer Cuando Vuelve ---------- */
+  document.getElementById('verBtn').addEventListener('click', () => {
+    const q1 = document.querySelector('input[name="q1"]:checked');
+    const q2 = document.querySelector('input[name="q2"]:checked');
+    const q3 = document.querySelector('input[name="q3"]:checked');
+    if (!q1 || !q2 || !q3) { alert('Responde las tres preguntas para ver tu lectura.'); return; }
+    const score = parseInt(q1.value) + parseInt(q2.value) + parseInt(q3.value);
+    const resultBox = document.getElementById('result');
+    let html = '';
+    if (score >= 3) {
+      html = `<h3>Patrón clásico de regreso intermitente</h3>
+      <p>Lo que describes coincide con el patrón del Capítulo 1: silencio, regreso sin cambio demostrado, y una urgencia interna de responder "esta vez sí" (Capítulo 3, costo hundido). No es una condena definitiva de la relación, pero sí una señal para no reaccionar desde el impulso.</p>
+      <div class="script-box">"Me da gusto que escribas. Antes de retomar esto, necesito ver cambios concretos, no solo palabras. Por ahora prefiero seguir con mi espacio."</div>`;
+    } else if (score === 2) {
+      html = `<h3>Señales mixtas — no te apures a decidir</h3>
+      <p>Hay elementos del patrón de regreso intermitente, pero también algo que podría ser un cambio real. Antes de decidir, dale tiempo a que el cambio se sostenga sin que tú tengas que sostenerlo por ambos.</p>
+      <div class="script-box">"Valoro que quieras intentarlo. Vamos a ir paso a paso — necesito ver que esto se mantiene en el tiempo antes de volver a como estábamos."</div>`;
+    } else {
+      html = `<h3>Posible cambio genuino — avanza observando, no entregando todo de inmediato</h3>
+      <p>Las respuestas sugieren menos señales del patrón de regreso intermitente. Aun así, "avanzar con cautela" no es lo mismo que "no avanzar": dale espacio a la relación para demostrarse en el tiempo, sin apurar ni la confianza total ni el cierre definitivo.</p>
+      <div class="script-box">"Estoy dispuesta a ver cómo evoluciona esto, con calma y sin apuros de ninguno de los dos lados."</div>`;
+    }
+    html += `<p style="margin-top:14px;"><strong>Sin importar tu resultado:</strong> si notaste que marcaste "sí" en la pregunta 3, revisita el Capítulo 3 del libro — ese "lo voy a lamentar para siempre" suele ser la voz del costo hundido, no una predicción confiable sobre tu futuro.</p>`;
+    resultBox.innerHTML = html;
+    resultBox.style.display = 'block';
+    resultBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  });
+</script>
+</body>
+</html>
